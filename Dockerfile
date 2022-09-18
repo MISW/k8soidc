@@ -1,9 +1,19 @@
-FROM golang:1.18
+# workspace
+FROM golang:1.19 AS workspace
 
-ADD . /repository
-RUN cd /repository && go build -o /bin/k8soidc .
+COPY . /k8soidc
 
-FROM golang:1.18
-COPY --from=0 /bin/k8soidc /bin/
+WORKDIR /k8soidc
 
-CMD [ "/bin/k8soidc" ]
+RUN go mod download \
+ && GO111MODULE=on go build -o /k8soidc/k8soidc
+
+# production
+FROM gcr.io/distroless/base:debug AS production
+
+RUN ["/busybox/sh", "-c", "ln -s /busybox/sh /bin/sh"]
+RUN ["/busybox/sh", "-c", "ln -s /bin/env /usr/bin/env"]
+
+COPY --from=workspace /k8soidc/k8soidc /bin/k8soidc
+
+ENTRYPOINT ["/bin/k8soidc"]
