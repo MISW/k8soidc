@@ -7,7 +7,6 @@ import (
 	"log"
 	"net/http"
 	"os"
-
 	"strings"
 
 	"github.com/coreos/go-oidc/v3/oidc"
