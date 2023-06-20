@@ -6,7 +6,7 @@ COPY . /k8soidc
 WORKDIR /k8soidc
 
 RUN go mod download \
- && go build -buildmode pie -o /k8soidc/k8soidc
+  && CGO_ENABLED=0 go build -buildmode pie -o /k8soidc/k8soidc
 
 # production
 FROM gcr.io/distroless/base:debug AS production
